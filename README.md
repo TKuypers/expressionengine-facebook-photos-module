@@ -11,10 +11,10 @@ Upload the fb_photos directory to the third-party folder of your installation. G
 ### 2. Configuration
 Before you can use this module you have to register a Facebook app and obtain the App id, App secret and a Acces Token.
 You can get this at http://www.facebook.com/developers
-![alt text](https://github.com/TKuypers/expressionengine-facebook-photos-module/raw/master/src/images/settings.png "Settings")
+![alt text](https://github.com/TKuypers/expressionengine-facebook-photos-module/raw/master/src/images/settings.jpg "Settings")
 
 In the Modules page of your control panel click on the Facebook albums module and enter these settings. When the settings are saved you will be redirected to setup the albums you would like to use. 
-![alt text](https://github.com/TKuypers/expressionengine-facebook-photos-module/raw/master/src/images/albums.png "Albums")
+![alt text](https://github.com/TKuypers/expressionengine-facebook-photos-module/raw/master/src/images/albums.jpg "Albums")
 
 To use a album you have to fill in a short name, with this name you can use the album in the templates of your website. If you want the module to download the photos to your own website you have to select the sync checkbox and select a folder you want to use.
 
