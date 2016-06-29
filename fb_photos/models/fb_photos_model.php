@@ -1,15 +1,15 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * ExpressionEngine 3.x Facebook photo module
+ * ExpressionEngine 2.x Facebook photo module
  *
  * @package     ExpressionEngine
  * @module      Facebook Photos
  * @author      Ties Kuypers
- * @copyright   Copyright (c) 2016 - Ties Kuypers
- * @link        http://expertees.nl/expressionengine-facebook-photos-module
+ * @copyright   Copyright (c) 2014 - Ties Kuypers
+ * @link        http://expertees.nl/ee-addon/fb_photos
  * @license 
  *
- * Copyright (c) 2016, Expertees webdevelopment
+ * Copyright (c) 2014, Expertees webdevelopment
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -58,7 +58,7 @@ class Fb_photos_model extends CI_Model {
 			(
 				'appId'      => $this->settings->app_id,
 				'secret'     => $this->settings->secret,
-				'fileUpload' => $this->settings->file_upload
+				'fileUpload' => $this->settings->file_upload,
 			);	
 			
 			//Start the API
@@ -114,19 +114,6 @@ class Fb_photos_model extends CI_Model {
 	public function get_album($short_name)
 	{
 		$query = ee()->db->where('short_name', $short_name)->get('fb_photos_albums');
-		if($query->num_rows() > 0)
-		{
-			return $query->row_array();
-		}
-		
-		return NULL;
-	}
-
-
-
-	public function get_album_by_id($album_id)
-	{
-		$query = ee()->db->where('album_id', $album_id)->get('fb_photos_albums');
 		if($query->num_rows() > 0)
 		{
 			return $query->row_array();
@@ -199,7 +186,7 @@ class Fb_photos_model extends CI_Model {
 		//Try to load the albums
 		try
 		{
-			return $this->facebook->api($this->settings->app_id.'/albums','GET');
+			return $this->facebook->api('v2.3/'.$this->settings->app_id.'/albums','GET');
 		} 
 		catch(FacebookApiException $e) 
 		{
@@ -228,7 +215,7 @@ class Fb_photos_model extends CI_Model {
 		//Get the data from the api
 		try
 		{
-			$facebook_data = $this->facebook->api($album_id.'/photos?offset='.$start.'&limit='.$limit.'','GET');
+			$facebook_data = $this->facebook->api('v2.3/'.$album_id.'/photos?offset='.$start.'&limit='.$limit.'','GET');
 			if($use_cache)
 			{
 				//Set the cache
@@ -263,7 +250,7 @@ class Fb_photos_model extends CI_Model {
 		//Get album data
 		try
 		{
-			$facebook_data = $this->facebook->api($album_id,'GET');
+			$facebook_data = $this->facebook->api('v2.3/'.$album_id,'GET');
 			if($use_cache)
 			{
 				//Set the cache
@@ -349,26 +336,28 @@ class Fb_photos_model extends CI_Model {
 	
 	
 	
-	public function save_settings($configuration_id = 0, $name = '', $app_id = '', $secret = '', $access_token = '')
+	public function save_settings($configuration_id = 0, $name = '', $app_id = '', $secret = '', $access_token = '', $file_upload = 0)
 	{
 		//Set the data
 		$site_id = ee()->config->item('site_id');
 		$data = array
 		(
-			'site_id'		   => $site_id,
-			'configuration_id' => $configuration_id,
-			'name'             => $name,
-			'app_id'           => $app_id,
-			'secret'           => $secret,
-			'access_token'     => $access_token,
+			'name'         => $name,
+			'app_id'       => $app_id,
+			'secret'       => $secret,
+			'access_token' => $access_token,
+			'file_upload'  => $file_upload
 		);
 		
+			
 		//Go find a configuration row
 		$query = ee()->db->select('configuration_id')->where('site_id', $site_id)->get('fb_photos_configuration');
 
 		//Check if we want to update or save
 		if($query->num_rows() == 0) //Insert
 		{
+			$data['site_id'] = $site_id;
+			
 			//Insert the row
 			ee()->db->insert('fb_photos_configuration', $data);
 			
@@ -388,5 +377,41 @@ class Fb_photos_model extends CI_Model {
 		}
 		
 		return FALSE;
-	}			
+	}
+	
+	
+	
+	
+	
+	public function get_setting_rules()
+	{
+		
+		$rules = array
+		(
+		   array(
+				 'field'   => 'app_id',
+				 'label'   => lang('fb_photos:app_id'),
+				 'rules'   => 'required'
+			  ),
+		   array(
+				 'field'   => 'secret',
+				 'label'   => lang('fb_photos:secret'),
+				 'rules'   => 'required'
+			  ),
+		   array(
+				 'field'   => 'name',
+				 'label'   => lang('fb_photos:name'),
+				 'rules'   => 'required'
+			  ),
+		   array(
+				 'field'   => 'access_token',
+				 'label'   => lang('fb_photos:access_token'),
+				 'rules'   => 'required'
+			  )
+		);	
+		
+		return $rules;
+	}
+	
+			
 }

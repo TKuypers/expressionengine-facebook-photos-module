@@ -1,15 +1,15 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * ExpressionEngine 3.x Facebook photo module
+ * ExpressionEngine 2.x Facebook photo module
  *
  * @package     ExpressionEngine
  * @module      Facebook Photos
  * @author      Ties Kuypers
- * @copyright   Copyright (c) 2016 - Ties Kuypers
- * @link        http://expertees.nl/expressionengine-facebook-photos-module
+ * @copyright   Copyright (c) 2014 - Ties Kuypers
+ * @link        http://expertees.nl/ee-addon/fb_photos
  * @license 
  *
- * Copyright (c) 2016, Expertees webdevelopment
+ * Copyright (c) 2014, Expertees webdevelopment
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -46,17 +46,13 @@ class Fb_photos {
 	{	
 		//Get the name
 		$short_name = ee()->TMPL->fetch_param('name', '');
-		$pagination = (ee()->TMPL->fetch_param('pagination', 'yes') == 'yes') ? TRUE : FALSE;
-		$param      = ee()->TMPL->fetch_param('param', 'page');
-		$page       = ee()->input->get($param, 0);
+		$start      = ee()->TMPL->fetch_param('start', 0);
 		$limit      = ee()->TMPL->fetch_param('limit', 25);
-		$start      = ($pagination) ? ($page * $limit) : 0;
-
-
+		
 		//Get the album
 		$album = ee()->fb_photos_model->get_album($short_name);
 		if($album == NULL)
-			return lang('no_album_found');	
+			return lang('fb_photos:no_album_found');	
 		
 		
 		//Check the synchronisation
@@ -83,6 +79,7 @@ class Fb_photos {
 
 		foreach($photos_data as $key => $photo)
 		{
+			
 			$photo_list[$key] = array
 			(
 				'name'     => (isset($photo['name'])) ? $photo['name'] : '',
@@ -213,10 +210,8 @@ class Fb_photos {
 	{
 		//Get the name
 		$short_name = ee()->TMPL->fetch_param('name', '');
-		$param      = ee()->TMPL->fetch_param('param', 'page');
-		$page       = ee()->input->get($param, 0);
+		$start      = ee()->TMPL->fetch_param('start', 0);
 		$limit      = ee()->TMPL->fetch_param('limit', 25);
-		$start      = ($page * $limit);
 		
 		//Get the album
 		$album = ee()->fb_photos_model->get_album($short_name);
@@ -247,8 +242,8 @@ class Fb_photos {
 			'prev'   => $prev,
 			'next'   => $next,
 			
-			'prev_offset' => ($page-1 < 0) ? 0 : ($page-1),
-			'next_offset' => ($page+1),
+			'prev_offset' => (($start-$limit) < 0) ? 0 : ($start-$limit),
+			'next_offset' => ($start+$limit),
 		);
 		
 		return ee()->TMPL->parse_variables_row(ee()->TMPL->tagdata, $vars);

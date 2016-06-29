@@ -1,15 +1,15 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * ExpressionEngine 3.x Facebook photo module
+ * ExpressionEngine 2.x Facebook photo module
  *
  * @package     ExpressionEngine
  * @module      Facebook Photos
  * @author      Ties Kuypers
- * @copyright   Copyright (c) 2016 - Ties Kuypers
- * @link        http://expertees.nl/expressionengine-facebook-photos-module
+ * @copyright   Copyright (c) 2014 - Ties Kuypers
+ * @link        http://expertees.nl/ee-addon/fb_photos
  * @license 
  *
- * Copyright (c) 2016, Expertees webdevelopment
+ * Copyright (c) 2014, Expertees webdevelopment
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -32,8 +32,6 @@
  * source is null and void. Use of this software constitutes your agreement
  * to this clause.
  */
-use EllisLab\ExpressionEngine\Library\CP\Table;
-
 class Fb_photos_mcp { 
     
 	
@@ -44,104 +42,82 @@ class Fb_photos_mcp {
     {
 		//Load
 		ee()->load->model('fb_photos_model');
-		ee()->load->helper('array');
+		
+		//Set the right nav
+		$this->right_nav = array
+		(
+			'fb_photos:albums'   => BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=fb_photos',
+			'fb_photos:settings' => BASE.AMP.'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=fb_photos'.AMP.'method=settings',
+		);
+		
+		ee()->view->cp_page_title = lang('fb_photos:page_title');
+		ee()->cp->set_right_nav($this->right_nav);
     }
+	
+	
 	
 	
 	
 	
 	public function index($message = '')
 	{
-		// check if we have settings
+		//Check if we have settings
 		$has_settings = ee()->fb_photos_model->has_settings();
 		if(!$has_settings)
-			ee()->functions->redirect(ee('CP/URL', 'addons/settings/fb_photos/settings')->compile());
+			ee()->functions->redirect($this->right_nav['fb_photos:settings']);
+		
+		//Load
+		ee()->load->helper('array');
 
-		// the form
-		$configuration_id = 1;
-		$data 			  = array();
-		$upload_dirs      = ee()->fb_photos_model->get_upload_dropdown();
+		//Get the settings
+		$settings         = ee()->fb_photos_model->get_settings();
+		$configuration_id = ($settings != NULL) ? $settings->configuration_id : 0;
 
-		// check if we have data
-		if(isset($_POST['settings']))
+		//Save the settings
+		if(ee()->input->post('album_id'))
 		{
-			// loop trough the settings
-			$settings = ee()->input->post('settings');
-			foreach($settings as $album_id => $album)
-			{
-				// check if we have data
-				if(empty($album['short_name']))
+			//Loop trough the albums
+			$album_ids = ee()->input->post('album_id');
+			$name       = ee()->input->post('name'); 
+			$short_name = ee()->input->post('short_name');
+			$sync       = ee()->input->post('sync');
+			$sync_to    = ee()->input->post('sync_to');
+				
+			foreach($album_ids as $album_id)
+			{	
+				//Remove the album		
+				if($short_name[$album_id] == '')
 				{
-					// check if there is a row in the database
-					if(ee()->fb_photos_model->get_album_by_id($album_id) != NULL)
-					{
-						// delete the database row
-						ee()->fb_photos_model->remove_album($album_id);
-					}
+					ee()->fb_photos_model->remove_album($album_id);
 				}
 				else
 				{
-					$name       = $album['name'];
-					$short_name = $album['short_name'];
-					$sync       = ($album['sync'] == 'y') ? 1 : 0;
-					$sync_to    = $album['sync_to'];
-
-					// save the album
-					ee()->fb_photos_model->save_album($album_id, $configuration_id, $name, $short_name, $sync, $sync_to);
+					ee()->fb_photos_model->save_album($album_id, $configuration_id, $name[$album_id], $short_name[$album_id], element($album_id, $sync, 0), element($album_id, $sync_to, ''));
 				}
-
-				// set the success message
-				ee('CP/Alert')->makeBanner('success-message')
-				->asSuccess()
-				->withTitle(lang('saved'))
-				->addToBody(lang('form_saved'))->now();
 			}
 		}
 
 
-		// get the albums
+		//Set breadcrumb
+		ee()->view->cp_page_title = lang('fb_photos:albums');	
+		
+		//Get the facebook albums
 		$albums       = ee()->fb_photos_model->get_album_list();
 		$saved_albums = ee()->fb_photos_model->get_albums($configuration_id);
-
-		if($saved_albums == NULL)
-			$saved_albums = array();
-
-
-		// loop trough the albums
-		foreach($albums['data'] as $album)
-		{
-			$field_name = url_title(strtolower($album['name']), '_');
-			$curr_album = element($album['id'], $saved_albums, array());
-
-			// vars		
-			$name       = $album['name'];
-			$short_name = element('short_name', $curr_album, '');
-			$sync       = (element('sync', $curr_album, 0) == 1) ? 'y' : 'n';
-			$sync_to    = element('sync_to', $curr_album, 0);
-
-			$data[] = array
-			(
-				$name.form_hidden('settings['.$album['id'].'][name]', $name),
-				form_input('settings['.$album['id'].'][short_name]', $short_name),
-				form_yes_no_toggle('settings['.$album['id'].'][sync]', $sync),
-				form_dropdown('settings['.$album['id'].'][sync_to]', $upload_dirs, $sync_to)
-			);
-		}
-
-		// final view variables we need to render the form
-		$url = ee('CP/URL', 'addons/settings/fb_photos');
-		$vars = array
+	
+		//Set the data
+		$data = array
 		(
-			'data'          => $data,
-			'base_url' 		=> ee('CP/URL', 'addons/settings/fb_photos/'),
-			'cp_page_title' => lang('albums'),
-		);	
-
-		return array
-		(
-		  	'body'       => ee('View')->make('fb_photos:list')->render($vars),
-			'heading'    => lang('album_settings'),
+			'action'       => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=fb_photos',
+			'albums'       => $albums['data'],
+			
+			'saved_albums' => ($saved_albums != NULL) ? $saved_albums : array(),
+			
+			'upload_prefs' => ee()->fb_photos_model->get_upload_dropdown(),
 		);
+		
+		return ee()->load->view('album_form', $data, TRUE);
+	
 	}
 	
 	
@@ -150,123 +126,79 @@ class Fb_photos_mcp {
     
 	public function settings()
 	{
-		// check if we have a result
-		$rules = array(
-		 	'name'         => 'required|minLength[3]',
-		 	'app_id'       => 'required|minLength[3]',
-		 	'secret'       => 'required|minLength[3]',
-		 	'access_token' => 'required|minLength[3]',
-		);
-		$result = ee('Validation')->make($rules)->validate($_POST);
-
-		if($result->isValid())
+		//Check the form validation
+		ee()->load->library('form_validation');
+		ee()->load->helper('array');
+		
+		//Get the rules
+		$form_values = array();
+		$rules		 = ee()->fb_photos_model->get_setting_rules();
+		
+		//Set up the validation
+		ee()->form_validation->set_rules($rules); 
+		if(ee()->form_validation->run() == TRUE)
 		{
-			$configuration_id = 1;
-			$name  			  = ee()->input->post('name');
-			$app_id           = ee()->input->post('app_id');
-			$secret           = ee()->input->post('secret');
-			$access_token     = ee()->input->post('access_token');
-
-			// save the values
-			$save = ee()->fb_photos_model->save_settings($configuration_id, $name, $app_id, $secret, $access_token);
-
-			if($save !== FALSE)
-			{
-				ee('CP/Alert')->makeBanner('success-message')
-					->asSuccess()
-					->withTitle(lang('saved'))
-					->addToBody(lang('form_saved'))
-					->defer();
-
-				ee()->functions->redirect(ee('CP/URL', 'addons/settings/fb_photos/')->compile());
-				exit;
-			}
-		}
-		else
-		{
-			$name         = '';
-			$app_id       = '';
-			$secret       = '';
-			$access_token = '';
-
-			//Get the settings
-			$settings = ee()->fb_photos_model->get_settings();
-			if($settings != NULL)
-			{
-				$name         = $settings->name;
-				$app_id       = $settings->app_id;
-				$secret       = $settings->secret;
-				$access_token = $settings->access_token;
-			}
-
-			$form = array
+			//Get the data	
+			$form_values = array
 			(
-				array(
-					array(
-						'title' => 'name',
-						'fields' => array(
-							'name' => array(
-								'type'     => 'text',
-								'value'    => $name,
-								'required' => TRUE
-							)
-						),
-					),
-					array(
-						'title' => 'app_id',
-						'fields' => array(
-							'app_id' => array(
-								'type'     => 'text',
-								'value'    => $app_id,
-								'required' => TRUE
-							)
-						),
-					),
-					array(
-						'title' => 'secret',
-						'fields' => array(
-							'secret' => array(
-								'type'     => 'text',
-								'value'    => $secret,
-								'required' => TRUE
-							)
-						),
-					),
-					array(
-						'title' => 'access_token',
-						'fields' => array(
-							'access_token' => array(
-								'type'     => 'text',
-								'value'    => $access_token,
-								'required' => TRUE
-							),
-						),
-					),
-				)
+				'name'         => ee()->input->post('name'),
+				'app_id'       => ee()->input->post('app_id'),
+				'secret'       => ee()->input->post('secret'),
+				'access_token' => ee()->input->post('access_token'),
+				'file_upload'  => (ee()->input->post('file_upload') == 1) ? 1 : 0,
 			);
+			
+			//Save the settings
+			$save = ee()->fb_photos_model->save_settings(0, $form_values['name'], $form_values['app_id'], $form_values['secret'], $form_values['access_token'], $form_values['file_upload']);
+			if($save === FALSE)
+			{
+				ee()->session->set_flashdata('message_failure', lang('fb_photos:settings_save_failed'));
+			}
+			else
+			{
+				ee()->session->set_flashdata('message_success', lang('fb_photos:settings_saved'));
+			}
+			ee()->functions->redirect($this->right_nav['fb_photos:settings']);
 
-			// final view variables we need to render the form
-			$vars = array('sections' => $form);
-			$vars += array
+		}
+		
+		//Set breadcrumb
+		ee()->view->cp_page_title = lang('fb_photos:settings');
+		
+		
+		//Get the settings
+		$settings = ee()->fb_photos_model->get_settings();
+		if($settings != NULL)
+		{
+			//Set the values
+			$form_values = array
 			(
-				'base_url' 			    => ee('CP/URL', 'addons/settings/fb_photos/settings'),
-				'cp_page_title' 		=> lang('api_settings'),
-				'save_btn_text' 		=> 'btn_save_form',
-				'save_btn_text_working' => 'btn_saving'
+				'name'         => $settings->name,
+				'app_id'       => $settings->app_id,
+				'secret'       => $settings->secret,
+				'access_token' => $settings->access_token,
+				'file_upload'  => ($settings->file_upload == 1) ? TRUE : FALSE,
 			);	
-
-			// add the error to the form
-			if($_POST)
-				$vars['errors'] = $result;
-
-			ee()->cp->add_js_script(array('file' => array('cp/form_group')));
-
-			return array
-			(
-			  	'body'       => ee('View')->make('fb_photos:form')->render($vars),
-			  	'breadcrumb' => array(ee('CP/URL', 'addons/settings/fb_photos/')->compile() => lang('fb_photos_module_name')),
-				'heading'    => lang('album_settings')
-			);
 		}
-	}	
+		
+		
+		$data = array
+		(
+			'action'      => 'C=addons_modules'.AMP.'M=show_module_cp'.AMP.'module=fb_photos'.AMP.'method=settings',
+			'form_values' => $form_values, 
+		);
+		
+		//Return the form
+		return ee()->load->view('settings_form', $data, TRUE);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

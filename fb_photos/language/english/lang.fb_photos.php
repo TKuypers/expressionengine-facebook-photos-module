@@ -9,34 +9,30 @@ $lang = array(
 'fb_photos_module_name'        => 'Facebook Albums',
 'fb_photos_module_description' => 'Display facebook albums on your website',
 
-'albums'             => 'Albums',
-'album_settings'     => 'Album settings',
+'fb_photos:albums'             => 'Albums',
+'fb_photos:settings'           => 'Settings',
 
-'saved'              => 'Saved',
-'form_saved'		 => 'The album settings are succesfully saved',
+'fb_photos:page_title'         => 'Facebook Albums',
 
-'api_settings'		 => 'Facebook API settings',
-'app_id'             => 'Your app/page id',
-'secret'             => 'Your app secret',
-'name'               => 'Name',
-'file_upload'        => 'Can upload',
-'access_token'       => 'Access token',
+'fb_photos:app_id'             => 'Your app/page id',
+'fb_photos:secret'             => 'Your app secret',
+'fb_photos:name'               => 'Name',
+'fb_photos:file_upload'        => 'Can upload',
+'fb_photos:access_token'       => 'Access token',
 
-'btn_save_form'		 => 'Save',
+'fp_photos:api_exception'      => 'Could not connect with the Facebook API, check your settings',
 
-'api_exception'      => 'Could not connect with the Facebook API, check your settings',
+'fb_photos:no_album_found'     => 'No album found...',
 
-'no_album_found'     => 'No album found...',
+'fb_photos:album'              => 'Album',
+'fb_photos:short_name'         => 'Short name',
+'fb_photos:images'             => 'Images',
+'fb_photos:likes'              => 'Likes',
+'fb_photos:sync'               => 'Sync',
+'fb_photos:sync_to'            => 'Sync to',
 
-'album'              => 'Album',
-'short_name'         => 'Short name',
-'images'             => 'Images',
-'likes'              => 'Likes',
-'sync'               => 'Sync',
-'sync_to'            => 'Sync to',
-
-'settings_save_failed' => 'The settings could not be saved',
-'settings_saved'       => 'Settings saved',
+'fb_photos:settings_save_failed' => 'The settings could not be saved',
+'fb_photos:settings_saved'       => 'Settings saved',
 // END
 ''=>''
 );

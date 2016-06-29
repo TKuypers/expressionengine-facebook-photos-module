@@ -9,34 +9,30 @@ $lang = array(
 'fb_photos_module_name' 	   => 'Facebook albums',
 'fb_photos_module_description' => 'Gebruik Facebook albums op je website',
 
-'albums'             => 'Albums',
-'album_settings'     => 'Album instellingen',
+'fb_photos:albums'             => 'Overzicht',
+'fb_photos:settings'           => 'Instellingen',
 
+'fb_photos:page_title'         => 'Facebook albums',
 
-'saved'              => 'Opgeslagen',
-'form_saved'		 => 'Instellingen zijn succesvol opgeslagen',
+'fb_photos:app_id'             => 'Jouw app/page id',
+'fb_photos:secret'             => 'Jouw app secret',
+'fb_photos:name'               => 'Naam',
+'fb_photos:file_upload'        => 'Uploaden mogelijk',
+'fb_photos:access_token'       => 'Access token',
 
-'api_settings'		 => 'Facebook API instellingen',
-'app_id'             => 'App/page id',
-'secret'             => 'app secret',
-'name'               => 'Naam',
-'access_token'       => 'Access token',
+'fp_photos:api_exception'      => 'Kon geen verbinding met de Facebook API maken, controleer je gegevens',
 
-'btn_save_form'		 => 'Opslaan',
+'fb_photos:no_album_found'     => 'Geen album gevonden...',
 
-'api_exception'      => 'Kon geen verbinding met de Facebook API maken, controleer je gegevens',
+'fb_photos:album'              => 'Album',
+'fb_photos:short_name'         => 'Verkorte naam',
+'fb_photos:images'             => 'Afbeeldingen',
+'fb_photos:likes'              => 'Likes',
+'fb_photos:sync'               => 'Synchroniseer',
+'fb_photos:sync_to'            => 'Synchroniseer naar',
 
-'no_album_found'     => 'Geen album gevonden...',
-
-'album'              => 'Album',
-'short_name'         => 'Verkorte naam',
-'images'             => 'Afbeeldingen',
-'likes'              => 'Likes',
-'sync'               => 'Synchroniseer',
-'sync_to'            => 'Synchroniseer naar',
-
-'settings_saved'       => 'De gegevens zijn succesvol opgeslagen',        
-'settings_save_failed' => 'De gegevens konden niet worden opgeslagen',
+'fb_photos:settings_saved'       => 'De gegevens zijn succesvol opgeslagen',        
+'fb_photos:settings_save_failed' => 'De gegevens konden niet worden opgeslagen',
   
 // END
 ''=>''

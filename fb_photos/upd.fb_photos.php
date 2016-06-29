@@ -1,15 +1,15 @@
 <?php if(!defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * ExpressionEngine 3.x Facebook photo module
+ * ExpressionEngine 2.x Facebook photo module
  *
  * @package     ExpressionEngine
  * @module      Facebook Photos
  * @author      Ties Kuypers
- * @copyright   Copyright (c) 2016 - Ties Kuypers
- * @link        http://expertees.nl/expressionengine-facebook-photos-module
+ * @copyright   Copyright (c) 2014 - Ties Kuypers
+ * @link        http://expertees.nl/ee-addon/fb_photos
  * @license 
  *
- * Copyright (c) 2016, Expertees webdevelopment
+ * Copyright (c) 2014, Expertees webdevelopment
  * All rights reserved.
  *
  * This source is commercial software. Use of this software requires a
@@ -34,15 +34,8 @@
  */
 class Fb_photos_upd 
 { 
-    var $version      = '1.1.0'; 
+    var $version      = '1.0.3'; 
     var $name         = 'Fb_photos';
-	var $config_table = 'Fb_photos';
-	 
-	 
-    public function __construct()
-    {
-		ee()->load->dbforge();
-    }
 	
 	// --------------------------------------------------------------------
 
